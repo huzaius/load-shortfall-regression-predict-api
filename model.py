@@ -47,7 +47,7 @@ def _preprocess_data(data):
     # Convert the json string to a python dictionary object
     feature_vector_dict = json.loads(data)
     # Load the dictionary as a Pandas DataFrame.
-    feature_vector_df = pd.DataFrame.from_dict([feature_vector_dict])
+    df = feature_vector_df = pd.DataFrame.from_dict([feature_vector_dict])
 
     # ---------------------------------------------------------------
     # NOTE: You will need to swap the lines below for your own data
@@ -59,70 +59,57 @@ def _preprocess_data(data):
 
     # ----------- Replace this code with your own preprocessing steps --------
     
-    #df =pd.read_csv('./data/df_train.csv')
     
-    
-    
-    
-    #Dropping the features with large amount of outliers
-    #df = df.drop(['Barcelona_rain_1h', 
-    df = feature_vector_df.drop(['Barcelona_rain_1h',    
-    'Seville_rain_1h',           
-    'Bilbao_snow_3h',           
-    'Barcelona_pressure',      
-    'Seville_rain_3h',          
-    'Madrid_rain_1h',            
-    'Barcelona_rain_3h',      
-    'Valencia_snow_3h', 'Bilbao_rain_1h'        
-    ], axis = 1)
-    
-    #Dropping the features with large amount of outliers
-    
-    
+
     # create new features by replacing null values
-    df_cln_train = df
-    df_cln_train['Valencia_pressure'] = df_cln_train['Valencia_pressure'].fillna(df_cln_train['Valencia_pressure'].mode()[0])
+    # df = df
+    df['Valencia_pressure'] = df['Valencia_pressure'].fillna(1016.0)
     
 
     #Appropriate datatype for time
-    df_cln_train['time'] = pd.to_datetime(df_cln_train['time'])
+    df['time'] = pd.to_datetime(df['time'])
     
 
     #Converting Valencia data to numeric
-    df_cln_train['Valencia_wind_deg']= df_cln_train['Valencia_wind_deg'].str.extract('(\d+)')
-    df_cln_train['Valencia_wind_deg'] = pd.to_numeric(df_cln_train['Valencia_wind_deg'])
+    df['Valencia_wind_deg']= df['Valencia_wind_deg'].str.extract('(\d+)')
+    df['Valencia_wind_deg'] = pd.to_numeric(df['Valencia_wind_deg'])
     
 
     #Converting Seville Pressure to numeric
-    df_cln_train.Seville_pressure = df_cln_train.Seville_pressure.str.extract('(\d+)')
+    df.Seville_pressure = df.Seville_pressure.str.extract('(\d+)')
     
-    df_cln_train.Seville_pressure = pd.to_numeric(df_cln_train['Seville_pressure'])
+    df.Seville_pressure = pd.to_numeric(df['Seville_pressure'])
     
 
     #extracting year month and day for the time column
-    df_cln_train.insert(2, 'Year', df_cln_train.time.dt.year) 
-    df_cln_train.insert(3,'Month',df_cln_train.time.dt.month)
-    df_cln_train.insert(4,'Day',df_cln_train.time.dt.day)
+    df.insert(2, 'Year', df.time.dt.year) 
+    df.insert(3,'Month',df.time.dt.month)
+    df.insert(4,'Day',df.time.dt.day)
 
     
 
-    #Dropping Time and Unnamed Columns
-    df_cln_train = df_cln_train.drop(['Unnamed: 0', 'time'], axis = 1)
+    # #Dropping Time and Unnamed Columns
+    df = df.drop(['Unnamed: 0', 'time'], axis = 1)
     
     
-    df_cln_train = df_cln_train.drop(['Valencia_temp_min', 'Madrid_temp', 'Barcelona_temp', 'Madrid_temp_max' ], axis = 1)
-    df_cln_train = df_cln_train.drop(['Bilbao_temp_max', 'Bilbao_temp', 'Madrid_temp_min', 'Seville_temp_min'], axis = 1)
-    df_cln_train = df_cln_train.drop(['Valencia_temp', 'Bilbao_temp_min', 'Barcelona_temp_max', 'Seville_temp' ], axis = 1)
-    df_cln_train = df_cln_train.drop(['Bilbao_weather_id', 'Valencia_temp_max', 'Seville_temp_max', 'Barcelona_weather_id'], axis = 1)
-    df_cln_train = df_cln_train.drop(['Seville_weather_id', 'Madrid_weather_id'], axis = 1)
-    df_cln_train = df_cln_train.drop(['Madrid_clouds_all', 'Seville_clouds_all'], axis = 1)
+    df = df.drop(['Valencia_temp_min', 'Madrid_temp', 'Barcelona_temp', 'Madrid_temp_max' ], axis = 1)
+    df = df.drop(['Bilbao_temp_max', 'Bilbao_temp', 'Madrid_temp_min', 'Seville_temp_min'], axis = 1)
+    df = df.drop(['Valencia_temp', 'Bilbao_temp_min', 'Barcelona_temp_max', 'Seville_temp' ], axis = 1)
+    df = df.drop(['Bilbao_weather_id', 'Valencia_temp_max', 'Seville_temp_max', 'Barcelona_weather_id'], axis = 1)
+    df = df.drop(['Seville_weather_id', 'Madrid_weather_id'], axis = 1)
+    df = df.drop(['Madrid_clouds_all', 'Seville_clouds_all'], axis = 1)
     
     
 
-    feature_vector_df = df_cln_train
+    predict_vector = df[['Year', 'Month', 'Day', 'Madrid_wind_speed', 'Valencia_wind_deg',
+       'Valencia_wind_speed', 'Seville_humidity', 'Madrid_humidity',
+       'Bilbao_clouds_all', 'Bilbao_wind_speed', 'Bilbao_wind_deg',
+       'Barcelona_wind_speed', 'Barcelona_wind_deg', 'Seville_wind_speed',
+       'Seville_pressure', 'Bilbao_pressure', 'Valencia_pressure',
+       'Madrid_pressure', 'Valencia_humidity', 'Barcelona_temp_min']]
 
     
-    predict_vector = feature_vector_df#[['Madrid_wind_speed','Bilbao_rain_1h','Valencia_wind_speed']]
+    # predict_vector = feature_vector_df#[['Madrid_wind_speed','Bilbao_rain_1h','Valencia_wind_speed']]
     # ------------------------------------------------------------------------
 
     return predict_vector
